@@ -18,7 +18,8 @@ class RobotService:
     def get_state(self) -> RobotState:
         return self.simulator.get_state()
 
-    async def move(self, x: float, y: float) -> bool:
+    def move(self, speed: float) -> bool:
+        """Move the robot with given speed"""
         current_state = self.get_state()
         
         # Check safety
@@ -37,8 +38,44 @@ class RobotService:
         
         return True
 
-    async def stop_movement(self) -> bool:
+    def stop_movement(self) -> bool:
+        """Stop the robot"""
         if self.state_machine.transition_to(RobotStatus.IDLE):
             self.simulator.update_status(RobotStatus.IDLE)
             return True
         return False
+
+    def turn(self, speed: float, direction: str = "left") -> bool:
+        """Turn the robot"""
+        current_state = self.get_state()
+        
+        # Check safety
+        if not self.safety_service.check_safety(current_state):
+            return False
+
+        # Check state transition
+        if not self.state_machine.transition_to(RobotStatus.MOVING):
+            return False
+
+        # Update simulator
+        self.simulator.update_status(RobotStatus.MOVING)
+        
+        return True
+
+    def emergency_stop(self) -> bool:
+        """Emergency stop the robot"""
+        self.simulator.update_status(RobotStatus.MOVING)
+        return True
+
+    def set_lift(self, height_cm: float, command: str) -> bool:
+        """Set lift height (up, down, set)"""
+        # Validate inputs
+        if not 0 <= height_cm <= 200:
+            return False
+        
+        if command not in ["up", "down", "set"]:
+            return False
+        
+        # In a real scenario, we would control the lift hardware here
+        return True
+

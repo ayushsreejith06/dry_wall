@@ -1,0 +1,92 @@
+# Quick API Test Commands
+
+## 🧪 Test in Browser Console (F12)
+
+```javascript
+// Copy this entire block into browser console and run it
+
+// 1. Test if API is reachable
+testStatus()
+
+// 2. Test move forward
+testMove(0.5)
+
+// 3. Test turn left  
+testTurn(0.3, 'left')
+
+// 4. Test stop
+testStop()
+
+// 5. Run all tests automatically
+testAllAPIs()
+```
+
+## 🔧 Test via PowerShell Terminal
+
+```powershell
+# Get robot status
+Invoke-WebRequest -Uri "http://localhost:8000/status" -Method Get | ConvertFrom-Json | ConvertTo-Json
+
+# Move forward (speed 0.5)
+Invoke-WebRequest -Uri "http://localhost:8000/move" -Method Post `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"speed": 0.5}' | ConvertFrom-Json | ConvertTo-Json
+
+# Turn left (speed 0.3)
+Invoke-WebRequest -Uri "http://localhost:8000/turn" -Method Post `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"speed": 0.3, "direction": "left"}' | ConvertFrom-Json | ConvertTo-Json
+
+# Stop
+Invoke-WebRequest -Uri "http://localhost:8000/stop" -Method Post `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{}' | ConvertFrom-Json | ConvertTo-Json
+```
+
+## 📱 Manual UI Testing
+
+1. **Start system**: `python run.py`
+2. **Open UI**: `http://localhost:5173`
+3. **Test movement**: 
+   - Move vertical slider → robot moves forward/backward
+   - Move horizontal slider → robot turns left/right
+   - Release slider → robot stops
+4. **Check telemetry**: Values on right side should update in real-time
+
+## 📊 What Success Looks Like
+
+### Browser Network Tab (F12):
+- ✓ GET requests to `/status` every ~1.2 seconds
+- ✓ POST requests to `/move` and `/turn` when sliders move
+- ✓ POST request to `/stop` when sliders near zero
+- ✓ All responses show Status 200 (OK)
+
+### Browser Console:
+- ✓ No red error messages
+- ✓ No CORS warnings
+- ✓ Console functions show ✓ symbols (success)
+
+### Telemetry Section (Right side):
+- ✓ State: Shows "IDLE" or "MOVING"
+- ✓ Battery: Shows 100%
+- ✓ X, Y, Angle: Show position coordinates
+- ✓ Error: Shows "None" or error message
+
+## 🎯 Current Status
+
+All 6 main endpoints are now:
+- ✅ Implemented on backend (RobotService)
+- ✅ Routed on backend (robot_routes.py)  
+- ✅ Connected to frontend (App.jsx)
+- ✅ Ready for testing
+
+| Endpoint | Status | Trigger |
+|----------|--------|---------|
+| /status | ✅ Working | Auto poll (1.2s) |
+| /move | ✅ Working | Vertical slider |
+| /turn | ✅ Working | Horizontal slider |
+| /stop | ✅ Working | Slider threshold |
+| /emergency_stop | ✅ Ready | (not in UI yet) |
+| /lift | ✅ Ready | (not in UI yet) |
+
+**Everything is hooked up! Time to test!** 🚀

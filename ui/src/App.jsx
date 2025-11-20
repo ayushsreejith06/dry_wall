@@ -26,6 +26,7 @@ function App() {
   const [selectedRobotId, setSelectedRobotId] = useState(userProfile.robots[0].id);
   const [throttle, setThrottle] = useState(0);
   const [steering, setSteering] = useState(0);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const selectedRobot = useMemo(
     () => userProfile.robots.find((r) => r.id === selectedRobotId),
@@ -33,6 +34,8 @@ function App() {
   );
 
   useEffect(() => {
+    setConnectionStatus('scanning');
+    fetchStatus();
     const interval = setInterval(fetchStatus, 1200);
     return () => clearInterval(interval);
   }, [selectedRobotId]);
@@ -88,121 +91,135 @@ function App() {
     sendCommand('/turn', { speed: numeric });
   };
 
-  const statusClass = connectionStatus === 'connected' ? 'ok' : connectionStatus === 'connecting' ? 'connecting' : 'idle';
+  const statusClass =
+    connectionStatus === 'connected'
+      ? 'ok'
+      : connectionStatus === 'connecting' || connectionStatus === 'scanning'
+        ? 'connecting'
+        : 'idle';
 
   return (
     <div className="app-shell">
-      <header className="top-bar">
-        <div className="identity">
-          <div className="user-label">Signed in as {userProfile.name}</div>
-          <label className="select-label">
-            Robot
-            <select value={selectedRobotId} onChange={(e) => setSelectedRobotId(e.target.value)}>
-              {userProfile.robots.map((robot) => (
-                <option key={robot.id} value={robot.id}>
-                  {robot.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <div className="mode-toggle">
-          <span>Manual</span>
-          <label className="switch">
-            <input
-              type="checkbox"
-              checked={mode === 'auto'}
-              onChange={(e) => setMode(e.target.checked ? 'auto' : 'manual')}
-            />
-            <span className="slider" />
-          </label>
-          <span>Auto</span>
-        </div>
-      </header>
-
-      <main className="layout">
-        <section className="control-block">
-          <h3>Steering</h3>
-          <input
-            type="range"
-            min="-1"
-            max="1"
-            step="0.1"
-            value={steering}
-            className="vertical-range"
-            onChange={(e) => handleSteeringChange(e.target.value)}
-          />
-          <div className="range-labels">
-            <span>Left</span>
-            <span>Neutral</span>
-            <span>Right</span>
+      <div className="control-panel">
+        {/* Top Bar */}
+        <div className="panel-top-bar">
+          <div className="panel-top-left">
+            <div className="user-dropdown">
+              <button 
+                className="user-label"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+              >
+                Signed in as {userProfile.name}
+              </button>
+              {showUserMenu && (
+                <div className="user-menu">
+                  <div className="user-menu-item">Account Settings</div>
+                  <div className="user-menu-divider" />
+                  <div className="user-menu-item logout">Logout</div>
+                </div>
+              )}
+            </div>
+            <label className="select-label">
+              <select value={selectedRobotId} onChange={(e) => setSelectedRobotId(e.target.value)}>
+                {userProfile.robots.map((robot) => (
+                  <option key={robot.id} value={robot.id}>
+                    {robot.name}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
-        </section>
+          <div className="panel-top-right">
+            <span className={`mode-label ${mode === 'manual' ? 'active' : ''}`}>Manual</span>
+            <label className="switch">
+              <input
+                type="checkbox"
+                checked={mode === 'auto'}
+                onChange={(e) => setMode(e.target.checked ? 'auto' : 'manual')}
+              />
+              <span className="slider" />
+            </label>
+            <span className={`mode-label ${mode === 'auto' ? 'active' : ''}`}>Auto</span>
+          </div>
+        </div>
 
-        <section className="status-section">
-          <div className={`status-card ${statusClass}`}>
-            <div className="status-indicator" />
-            <div className="status-text">
-              <div className="status-title">{STATUS_TEXT[connectionStatus]}</div>
-              <div className="status-sub">
-                {selectedRobot ? `Robot: ${selectedRobot.name}` : 'No robot selected'}
-              </div>
+        {/* Main Control Area */}
+        <div className="panel-main">
+          {/* Left Half - Steering */}
+          <div className="control-half left-half">
+            <div className="horizontal-slider-container">
+              <input
+                type="range"
+                min="-1"
+                max="1"
+                step="0.05"
+                value={steering}
+                className="horizontal-range"
+                onChange={(e) => handleSteeringChange(e.target.value)}
+              />
             </div>
           </div>
 
-          <div className="telemetry">
-            <div className="telemetry-title">Telemetry</div>
-            {status ? (
-              <div className="telemetry-grid">
-                <div>
-                  <span className="label">State</span>
-                  <span className="value">{status.state}</span>
-                </div>
-                <div>
-                  <span className="label">Battery</span>
-                  <span className="value">{status.battery_voltage} V</span>
-                </div>
-                <div>
-                  <span className="label">X</span>
-                  <span className="value">{status.x.toFixed(2)}</span>
-                </div>
-                <div>
-                  <span className="label">Y</span>
-                  <span className="value">{status.y.toFixed(2)}</span>
-                </div>
-                <div>
-                  <span className="label">Angle</span>
-                  <span className="value">{status.angle.toFixed(2)}</span>
-                </div>
-                <div>
-                  <span className="label">Lift</span>
-                  <span className="value">{status.lift_height} cm</span>
-                </div>
-              </div>
-            ) : (
-              <div className="telemetry-empty">Waiting for connection...</div>
-            )}
+          {/* Right Half - Motion */}
+          <div className="control-half right-half">
+            <div className="vertical-slider-container">
+              <input
+                type="range"
+                min="-1"
+                max="1"
+                step="0.05"
+                value={throttle}
+                className="vertical-range"
+                onChange={(e) => handleThrottleChange(e.target.value)}
+              />
+            </div>
           </div>
-        </section>
+        </div>
 
-        <section className="control-block">
-          <h3>Motion</h3>
-          <input
-            type="range"
-            min="-1"
-            max="1"
-            step="0.1"
-            value={throttle}
-            className="vertical-range"
-            onChange={(e) => handleThrottleChange(e.target.value)}
-          />
-          <div className="range-labels">
-            <span>Reverse</span>
-            <span>Neutral</span>
-            <span>Forward</span>
+        {/* Bottom Status */}
+        <div className="panel-bottom">
+          <div className="status-label">Status ({connectionStatus})</div>
+        </div>
+      </div>
+
+      {/* Telemetry Section - Optional, can be on the side */}
+      <div className="telemetry-section">
+        <div className="telemetry">
+          <div className="telemetry-title">Telemetry</div>
+          <div className="telemetry-grid">
+            <div>
+              <span className="label">State</span>
+              <span className="value">{status ? status.status : 'no connection'}</span>
+            </div>
+            <div>
+              <span className="label">Battery</span>
+              <span className="value">{status ? `${status.battery_level}%` : 'no connection'}</span>
+            </div>
+            <div>
+              <span className="label">X</span>
+              <span className="value">{status ? status.position.x.toFixed(2) : 'no connection'}</span>
+            </div>
+            <div>
+              <span className="label">Y</span>
+              <span className="value">{status ? status.position.y.toFixed(2) : 'no connection'}</span>
+            </div>
+            <div>
+              <span className="label">Angle</span>
+              <span className="value">{status ? status.position.theta.toFixed(2) : 'no connection'}</span>
+            </div>
+            <div>
+              <span className="label">Error</span>
+              <span className="value">{status ? (status.error_message || 'None') : 'no connection'}</span>
+            </div>
           </div>
-        </section>
-      </main>
+        </div>
+
+        {/* Completion Map Section */}
+        <div className="completion-map">
+          <div className="completion-map-title">Floor Plan Progress</div>
+          <div className="floor-plan-placeholder" />
+        </div>
+      </div>
     </div>
   );
 }
