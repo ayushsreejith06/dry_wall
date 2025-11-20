@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useAuth } from './AuthContext';
+import Login from './Login';
 import './App.css';
 
 const API_URL = 'http://localhost:8000';
@@ -27,6 +29,12 @@ function App() {
   const [throttle, setThrottle] = useState(0);
   const [steering, setSteering] = useState(0);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const { isAuthenticated, user, logout, checkAuth } = useAuth();
+
+  // Check authentication on mount
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   const selectedRobot = useMemo(
     () => userProfile.robots.find((r) => r.id === selectedRobotId),
@@ -98,6 +106,11 @@ function App() {
         ? 'connecting'
         : 'idle';
 
+  // Show login page if not authenticated
+  if (!isAuthenticated) {
+    return <Login onLoginSuccess={() => {}} />;
+  }
+
   return (
     <div className="app-shell">
       <div className="control-panel">
@@ -109,13 +122,26 @@ function App() {
                 className="user-label"
                 onClick={() => setShowUserMenu(!showUserMenu)}
               >
-                Signed in as {userProfile.name}
+                Signed in as {user?.name || userProfile.name}
               </button>
               {showUserMenu && (
                 <div className="user-menu">
-                  <div className="user-menu-item">Account Settings</div>
+                  <div className="user-menu-item">
+                    <small style={{ color: '#7f90a8' }}>@{user?.username}</small>
+                  </div>
+                  <div className="user-menu-item">
+                    <small style={{ color: '#7f90a8' }}>Logged in: {user?.loginTime}</small>
+                  </div>
                   <div className="user-menu-divider" />
-                  <div className="user-menu-item logout">Logout</div>
+                  <div 
+                    className="user-menu-item logout"
+                    onClick={() => {
+                      logout();
+                      setShowUserMenu(false);
+                    }}
+                  >
+                    Logout
+                  </div>
                 </div>
               )}
             </div>

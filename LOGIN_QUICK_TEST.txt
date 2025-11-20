@@ -1,0 +1,176 @@
+# Login System - Quick Test Guide
+
+## 🚀 Start the System
+
+```bash
+python run.py
+```
+
+Wait for output:
+```
+✅ System is running!
+Backend: http://localhost:8000
+UI:      http://localhost:5173
+```
+
+## 🌐 Open Login Page
+
+Navigate to: `http://localhost:5173`
+
+You should see a professional login page with:
+- Title: "Drywall Robot Control"
+- Username & Password fields
+- "Login" button
+- Three demo credential buttons
+
+## 👤 Login Options
+
+### Quick Way (Recommended)
+Click one of these demo buttons:
+- **alex** / password123 (Alex Contractor)
+- **operator** / op123 (Robot Operator)
+- **admin** / admin123 (System Admin)
+
+### Manual Way
+1. Type username: `alex`
+2. Type password: `password123`
+3. Click "Login"
+
+## ✅ After Login
+
+You should see:
+1. **Control Panel** (left side)
+   - Manual/Auto toggle
+   - Robot selector dropdown
+   - Horizontal slider (steering)
+   - Vertical slider (throttle)
+   - Status indicator
+
+2. **Telemetry Section** (right side)
+   - State indicator
+   - Battery percentage
+   - Position (X, Y, Angle)
+   - Error messages
+   - Floor plan placeholder
+
+3. **User Dropdown** (top-left)
+   - Shows your name: "Alex Contractor"
+   - Shows your username: @alex
+   - Shows login time
+   - Red "Logout" button
+
+## 🧪 Test the Features
+
+### Test 1: Verify User Info
+1. Click user dropdown (top-left)
+2. Confirm shows correct name and username
+3. Click elsewhere to close
+
+### Test 2: Move Sliders
+1. Move vertical slider → Status changes
+2. Move horizontal slider → Status changes
+3. Watch telemetry update in real-time
+
+### Test 3: Logout
+1. Click user dropdown
+2. Click red "Logout" button
+3. Should return to login page
+4. User info cleared
+
+### Test 4: Session Persistence
+1. Login with any demo user
+2. Refresh page (F5 or Ctrl+R)
+3. Should stay logged in (no return to login)
+4. Check user dropdown still shows your info
+
+### Test 5: Login Different User
+1. Logout
+2. Login as different user (e.g., "operator")
+3. User dropdown updates to show new user
+4. Can switch between users
+
+## 🔍 Check Browser Console
+
+Open DevTools: **F12**
+
+### Network Tab
+- See login requests (if connected to real API later)
+- Monitor robot API calls after login
+
+### Console Tab
+- Should see no red errors
+- Warnings OK, errors need investigation
+
+## ⚡ Quick Troubleshooting
+
+**Login button doesn't respond?**
+- Check console for errors (F12)
+- Verify credentials match demo list
+- Try clicking demo button instead
+
+**Blank page after login?**
+- Refresh page (F5)
+- Check console for errors
+- Verify App.jsx imported correctly
+
+**Logout not working?**
+- Hard refresh (Ctrl+Shift+R)
+- Clear browser cache
+- Try incognito window
+
+**Session lost after refresh?**
+- Check localStorage enabled
+- Try different browser
+- Clear browser cache
+
+## 📋 Demo Credentials Reference
+
+```
+┌─────────────┬──────────────┬──────────────────┐
+│ Username    │ Password     │ Name             │
+├─────────────┼──────────────┼──────────────────┤
+│ alex        │ password123  │ Alex Contractor  │
+│ operator    │ op123        │ Robot Operator   │
+│ admin       │ admin123     │ System Admin     │
+└─────────────┴──────────────┴──────────────────┘
+```
+
+## 🎯 Success Criteria
+
+✅ All tests pass when:
+- [ ] Login page loads first
+- [ ] Can login with demo credentials
+- [ ] Main app displays after login
+- [ ] User info shows in dropdown
+- [ ] Sliders work and update telemetry
+- [ ] Logout returns to login page
+- [ ] Session persists after refresh
+- [ ] No red errors in console
+
+## 📸 Expected Flow
+
+```
+START
+  ↓
+[Browser] → http://localhost:5173
+  ↓
+[Login Page] (username/password fields)
+  ↓
+Click demo button or enter credentials
+  ↓
+[Loading...] (brief moment)
+  ↓
+[Main App] with control panel + telemetry
+  ↓
+Click sliders → data updates
+  ↓
+Click user dropdown → logout
+  ↓
+[Login Page] again
+  ↓
+END
+```
+
+---
+
+**Everything ready!** Time to test: `python run.py` then open `http://localhost:5173` 🚀
