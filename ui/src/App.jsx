@@ -9,6 +9,8 @@ import ProjectFormPage from './ProjectFormPage';
 import UserSettingsPage from './UserSettingsPage';
 import AutoModePanel from './components/AutoModePanel';
 import StatusIndicator from './components/StatusIndicator';
+import SpotlightCard from './components/react-bits/SpotlightCard';
+import SimpleSlider from './components/react-bits/SimpleSlider';
 import { API_URL } from './config';
 import './App.css';
 
@@ -461,20 +463,22 @@ function App() {
 
               {/* Right Half - Motion */}
               <div className="control-half right-half">
-                <div className="vertical-slider-container">
-                  <input
-                    type="range"
-                    min="-1"
-                    max="1"
-                    step="0.05"
-                    value={throttle}
-                    className={`vertical-range ${throttleReturning ? 'returning' : ''} ${activeControl === 'throttle' ? 'active' : ''}`}
-                    onChange={(e) => handleThrottleChange(e.target.value)}
-                    onMouseUp={handleThrottleRelease}
-                    onTouchEnd={handleThrottleRelease}
-                    disabled={false}
-                  />
-                </div>
+                <SpotlightCard className="throttle-control-card">
+                  <div className="vertical-slider-container">
+                    <input
+                      type="range"
+                      min="-1"
+                      max="1"
+                      step="0.05"
+                      value={throttle}
+                      className={`vertical-range ${throttleReturning ? 'returning' : ''} ${activeControl === 'throttle' ? 'active' : ''}`}
+                      onChange={(e) => handleThrottleChange(e.target.value)}
+                      onMouseUp={handleThrottleRelease}
+                      onTouchEnd={handleThrottleRelease}
+                      disabled={false}
+                    />
+                  </div>
+                </SpotlightCard>
               </div>
             </>
           )}
@@ -528,41 +532,45 @@ function App() {
 
       {/* Telemetry Section - Optional, can be on the side */}
       <div className="telemetry-section">
-        <div className="telemetry">
-          <div className="telemetry-title">Telemetry</div>
-          <div className="telemetry-grid">
-            <div>
-              <span className="label">State</span>
-              <span className="value">{status ? status.status : 'no connection'}</span>
-            </div>
-            <div>
-              <span className="label">Battery</span>
-              <span className="value">{status ? `${status.battery_level}%` : 'no connection'}</span>
-            </div>
-            <div>
-              <span className="label">X</span>
-              <span className="value">{status ? status.position.x.toFixed(2) : 'no connection'}</span>
-            </div>
-            <div>
-              <span className="label">Y</span>
-              <span className="value">{status ? status.position.y.toFixed(2) : 'no connection'}</span>
-            </div>
-            <div>
-              <span className="label">Arm Height</span>
-              <span className="value">{status ? (status.arm_height?.toFixed(2) || '0.00') : 'no connection'}</span>
-            </div>
-            <div>
-              <span className="label">Arm Distance</span>
-              <span className="value">{status ? (status.arm_distance?.toFixed(2) || '0.00') : 'no connection'}</span>
+        <SpotlightCard className="telemetry-card">
+          <div className="telemetry">
+            <div className="telemetry-title">Telemetry</div>
+            <div className="telemetry-grid">
+              <div>
+                <span className="label">State</span>
+                <span className="value">{status ? status.status : 'no connection'}</span>
+              </div>
+              <div>
+                <span className="label">Battery</span>
+                <span className="value">{status ? `${status.battery_level}%` : 'no connection'}</span>
+              </div>
+              <div>
+                <span className="label">X</span>
+                <span className="value">{status ? status.position.x.toFixed(2) : 'no connection'}</span>
+              </div>
+              <div>
+                <span className="label">Y</span>
+                <span className="value">{status ? status.position.y.toFixed(2) : 'no connection'}</span>
+              </div>
+              <div>
+                <span className="label">Arm Height</span>
+                <span className="value">{status ? (status.arm_height?.toFixed(2) || '0.00') : 'no connection'}</span>
+              </div>
+              <div>
+                <span className="label">Arm Distance</span>
+                <span className="value">{status ? (status.arm_distance?.toFixed(2) || '0.00') : 'no connection'}</span>
+              </div>
             </div>
           </div>
-        </div>
+        </SpotlightCard>
 
         {/* Completion Map Section */}
-        <div className="completion-map">
-          <div className="completion-map-title">Floor Plan Progress</div>
-          <div className="floor-plan-placeholder" />
-        </div>
+        <SpotlightCard className="completion-map-card">
+          <div className="completion-map">
+            <div className="completion-map-title">Floor Plan Progress</div>
+            <div className="floor-plan-placeholder" />
+          </div>
+        </SpotlightCard>
 
         <div className="projects-link-wrapper">
           <Link className="projects-link" to="/projects">

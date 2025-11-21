@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { API_URL } from './config';
 import AnimatedText from './components/AnimatedText';
 import AnimatedButton from './components/AnimatedButton';
-import AnimatedCard from './components/AnimatedCard';
+import SpotlightCard from './components/react-bits/SpotlightCard';
 import LoadingSpinner from './components/LoadingSpinner';
 import StatusIndicator from './components/StatusIndicator';
 import './Projects.css';
@@ -87,7 +87,7 @@ export default function ProjectsPage() {
         </AnimatedText>
       </header>
 
-      <AnimatedCard delay={100}>
+      <SpotlightCard>
         <div className="projects-toolbar">
           <AnimatedButton
             variant="secondary"
@@ -191,7 +191,7 @@ export default function ProjectsPage() {
             </table>
           </div>
         )}
-      </AnimatedCard>
+      </SpotlightCard>
     </div>
   );
 }

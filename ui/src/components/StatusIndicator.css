@@ -91,3 +91,18 @@
   color: #ffb3b3;
 }
 
+/* Hide dot for completed status */
+.status-indicator .status-dot:has(+ .status-label:contains("Completed")) {
+  display: none;
+}
+
+/* Alternative: Hide dot when status is completed (using class) */
+.status-indicator.completed .status-dot {
+  display: none;
+}
+
+/* Hide dot in badge style */
+.status-indicator.badge .status-dot {
+  display: none;
+}
+

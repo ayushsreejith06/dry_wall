@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { API_URL } from './config';
 import AnimatedText from './components/AnimatedText';
 import AnimatedButton from './components/AnimatedButton';
-import AnimatedCard from './components/AnimatedCard';
+import SpotlightCard from './components/react-bits/SpotlightCard';
 import LoadingSpinner from './components/LoadingSpinner';
 import './ProjectDetailPage.css';
 
@@ -189,7 +189,7 @@ export default function ProjectDetailPage() {
       <div className="project-detail-content">
         {/* Map Section */}
         {project.location_data && (
-          <AnimatedCard delay={100} className="project-detail-section-wrapper">
+          <SpotlightCard className="project-detail-section-wrapper">
             <section className="project-detail-section">
               <h2>Location Map</h2>
             <div className="map-container">
@@ -220,11 +220,11 @@ export default function ProjectDetailPage() {
               </div>
             </div>
             </section>
-          </AnimatedCard>
+          </SpotlightCard>
         )}
 
         {/* Floor Plans Section */}
-        <AnimatedCard delay={150} className="project-detail-section-wrapper">
+        <SpotlightCard className="project-detail-section-wrapper">
           <section className="project-detail-section">
           <div className="section-header">
             <div>
@@ -320,10 +320,10 @@ export default function ProjectDetailPage() {
             </div>
           )}
           </section>
-        </AnimatedCard>
+        </SpotlightCard>
 
         {/* Notes Section */}
-        <AnimatedCard delay={200} className="project-detail-section-wrapper">
+        <SpotlightCard className="project-detail-section-wrapper">
           <section className="project-detail-section">
           <div className="section-header">
             <h2>Notes</h2>
@@ -370,10 +370,10 @@ export default function ProjectDetailPage() {
             </div>
           )}
           </section>
-        </AnimatedCard>
+        </SpotlightCard>
 
         {/* Project Status */}
-        <AnimatedCard delay={250} className="project-detail-section-wrapper">
+        <SpotlightCard className="project-detail-section-wrapper">
           <section className="project-detail-section">
           <h2>Project Information</h2>
           <div className="status-grid">
@@ -395,7 +395,7 @@ export default function ProjectDetailPage() {
             </div>
           </div>
           </section>
-        </AnimatedCard>
+        </SpotlightCard>
       </div>
     </div>
   );
