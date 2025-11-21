@@ -30,7 +30,15 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background: #0f1115;
-  transition: background 0.3s ease, color 0.3s ease;
+  transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+              color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-transitioning * {
+  transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 :root[data-theme='light'] body {

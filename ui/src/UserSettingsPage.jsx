@@ -163,11 +163,13 @@ export default function UserSettingsPage() {
   return (
     <div className="user-settings-page">
       <header className="user-settings-header">
-        <Link to="/" className="back-link">
+        <div>
+          <h1>Account Settings</h1>
+          <p className="muted">Manage your account information and preferences</p>
+        </div>
+        <Link to="/" className="ghost-link">
           ← Back to Controls
         </Link>
-        <h1>Account Settings</h1>
-        <p className="muted">Manage your account information and preferences</p>
       </header>
 
       {error && <div className="banner error">{error}</div>}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useTheme } from './ThemeContext';
@@ -26,6 +26,113 @@ const STATUS_TEXT = {
   connected: 'Connected',
 };
 
+function Joystick({ onMove, onRelease, disabled, x, y }) {
+  const joystickBaseRef = React.useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const getJoystickPosition = (clientX, clientY) => {
+    if (!joystickBaseRef.current) return { x: 0, y: 0 };
+    
+    const rect = joystickBaseRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const radius = rect.width / 2;
+    
+    const deltaX = (clientX - centerX) / radius;
+    const deltaY = (clientY - centerY) / radius;
+    
+    // Allow movement slightly past the edge (about 20% over-travel)
+    const maxDistance = 1.2;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    if (distance > maxDistance) {
+      return {
+        x: (deltaX / distance) * maxDistance,
+        y: (deltaY / distance) * maxDistance,
+      };
+    }
+    
+    return { x: deltaX, y: deltaY };
+  };
+
+  const handleStart = (clientX, clientY) => {
+    if (disabled) return;
+    setIsDragging(true);
+    const pos = getJoystickPosition(clientX, clientY);
+    onMove(pos.x, pos.y);
+  };
+
+  const handleMove = (clientX, clientY) => {
+    if (!isDragging || disabled) return;
+    const pos = getJoystickPosition(clientX, clientY);
+    onMove(pos.x, pos.y);
+  };
+
+  const handleEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    onRelease();
+  };
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e) => {
+      handleMove(e.clientX, e.clientY);
+    };
+
+    const handleMouseUp = () => {
+      handleEnd();
+    };
+
+    const handleTouchMove = (e) => {
+      e.preventDefault();
+      if (e.touches.length > 0) {
+        handleMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      handleEnd();
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isDragging, disabled]);
+
+  return (
+    <div
+      className="joystick-container"
+      onMouseDown={(e) => handleStart(e.clientX, e.clientY)}
+      onTouchStart={(e) => {
+        e.preventDefault();
+        if (e.touches.length > 0) {
+          handleStart(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }}
+      style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
+    >
+      <div ref={joystickBaseRef} className="joystick-base">
+        <div
+          className="joystick-stick"
+          style={{
+            transform: `translate(calc(-50% + ${x * 50}%), calc(-50% + ${y * 50}%))`,
+            transition: isDragging ? 'none' : 'transform 0.2s ease-out',
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [status, setStatus] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('scanning');
@@ -33,10 +140,13 @@ function App() {
   const [selectedRobotId, setSelectedRobotId] = useState(userProfile.robots[0].id);
   const [throttle, setThrottle] = useState(0);
   const [steering, setSteering] = useState(0);
+  const [joystickX, setJoystickX] = useState(0);
+  const [joystickY, setJoystickY] = useState(0);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [throttleReturning, setThrottleReturning] = useState(false);
   const [steeringReturning, setSteeringReturning] = useState(false);
   const [activeControl, setActiveControl] = useState(null);
+  const [isJoystickActive, setIsJoystickActive] = useState(false);
   const { isAuthenticated, user, logout, checkAuth } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
@@ -112,6 +222,45 @@ function App() {
       return;
     }
     sendCommand('/turn', { speed: numeric });
+  };
+
+  const handleJoystickMove = (x, y) => {
+    if (mode === 'auto') return;
+    setJoystickX(x);
+    setJoystickY(y);
+    setActiveControl('joystick');
+    setTimeout(() => setActiveControl(null), 200);
+    
+    // Send combined movement command
+    const magnitude = Math.sqrt(x * x + y * y);
+    if (magnitude < 0.05) {
+      sendCommand('/stop', {});
+      return;
+    }
+    
+    // Calculate angle and send appropriate commands
+    // For now, we'll send both move and turn commands
+    // You may want to adjust this based on your backend API
+    if (Math.abs(y) > 0.05) {
+      sendCommand('/move', { speed: -y }); // Negative Y for forward
+    } else {
+      sendCommand('/stop', {});
+    }
+    
+    if (Math.abs(x) > 0.05) {
+      sendCommand('/turn', { speed: x });
+    } else {
+      sendCommand('/turn', { speed: 0 });
+    }
+  };
+
+  const handleJoystickRelease = () => {
+    if (mode === 'auto') return;
+    setJoystickX(0);
+    setJoystickY(0);
+    setIsJoystickActive(false);
+    sendCommand('/stop', {});
+    sendCommand('/turn', { speed: 0 });
   };
 
   const handleThrottleRelease = () => {
@@ -235,30 +384,17 @@ function App() {
 
         {/* Main Control Area */}
         <div className="panel-main">
-          {/* Left Half - Steering */}
+          {/* Left Half - Joystick */}
           <div 
             className={`control-half left-half ${mode === 'auto' ? 'disabled' : ''}`}
-            data-steering={steering}
-            style={{ 
-              '--steering-value': Math.abs(steering),
-              '--steering-left': steering < 0 ? Math.abs(steering) : 0,
-              '--steering-right': steering > 0 ? Math.abs(steering) : 0
-            }}
           >
-            <div className="horizontal-slider-container">
-              <input
-                type="range"
-                min="-1"
-                max="1"
-                step="0.05"
-                value={steering}
-                className={`horizontal-range ${steeringReturning ? 'returning' : ''} ${activeControl === 'steering' ? 'active' : ''}`}
-                onChange={(e) => handleSteeringChange(e.target.value)}
-                onMouseUp={handleSteeringRelease}
-                onTouchEnd={handleSteeringRelease}
-                disabled={mode === 'auto'}
-              />
-            </div>
+            <Joystick
+              onMove={handleJoystickMove}
+              onRelease={handleJoystickRelease}
+              disabled={mode === 'auto'}
+              x={joystickX}
+              y={joystickY}
+            />
             {mode === 'auto' && (
               <div style={{ 
                 position: 'absolute', 
@@ -278,11 +414,6 @@ function App() {
           {/* Right Half - Motion */}
           <div 
             className={`control-half right-half ${mode === 'auto' ? 'disabled' : ''}`}
-            data-throttle={throttle}
-            style={{ 
-              '--throttle-forward': throttle > 0 ? Math.abs(throttle) : 0,
-              '--throttle-reverse': throttle < 0 ? Math.abs(throttle) : 0
-            }}
           >
             <div className="vertical-slider-container">
               <input
@@ -316,9 +447,7 @@ function App() {
         </div>
 
         {/* Bottom Status and Arm Controls */}
-        <div 
-          className={`panel-bottom ${activeControl && activeControl.startsWith('arm-') ? 'arm-active' : ''}`}
-        >
+        <div className="panel-bottom">
           <div className="arm-controls-left">
             <button
               className={`arm-button ${activeControl === 'arm-forward' ? 'active' : ''}`}
