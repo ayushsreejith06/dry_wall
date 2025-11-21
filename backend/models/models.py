@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 from pydantic import BaseModel
 from dataclasses import dataclass
 
@@ -24,8 +25,11 @@ class MoveCommand(BaseModel):
 
 class TurnCommand(BaseModel):
     speed: float
-    direction: str  # "left" or "right"
+    direction: Optional[str] = None  # "left" or "right", optional - will be derived from speed if not provided
 
 class LiftCommand(BaseModel):
     height_cm: float
     command: str  # "up", "down", "set"
+
+class ArmCommand(BaseModel):
+    direction: str  # "forward", "backward", "up", "down"

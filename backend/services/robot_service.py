@@ -79,3 +79,28 @@ class RobotService:
         # In a real scenario, we would control the lift hardware here
         return True
 
+    def control_arm(self, direction: str) -> bool:
+        """Control robot arm movement"""
+        current_state = self.get_state()
+        
+        # Check safety
+        if not self.safety_service.check_safety(current_state):
+            return False
+        
+        # Validate direction
+        if direction not in ["forward", "backward", "up", "down"]:
+            return False
+        
+        # Check state transition
+        if not self.state_machine.transition_to(RobotStatus.LIFT_MOVING):
+            return False
+        
+        # Update simulator
+        self.simulator.update_status(RobotStatus.LIFT_MOVING)
+        
+        # In a real scenario, we would send commands to arm hardware here
+        # For now, just log the command
+        print(f"[ARM] Moving {direction}")
+        
+        return True
+

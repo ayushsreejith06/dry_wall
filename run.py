@@ -71,7 +71,15 @@ def run_commands():
 
     # Ensure dependencies before starting
     npm_cmd = "npm.cmd" if sys.platform == "win32" else "npm"
-    python_ready = ensure_python_deps(["fastapi", "uvicorn", "pydantic"])
+    python_ready = ensure_python_deps([
+        "fastapi", 
+        "uvicorn", 
+        "pydantic",
+        "sqlalchemy",
+        "bcrypt",
+        "passlib",
+        "email_validator"
+    ])
     ui_ready = ensure_ui_deps(npm_cmd)
     if not (python_ready and ui_ready):
         return
