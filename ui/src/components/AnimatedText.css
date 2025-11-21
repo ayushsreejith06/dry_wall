@@ -1,0 +1,52 @@
+.animated-text {
+  opacity: 0;
+  transition: opacity var(--duration, 0.6s) cubic-bezier(0.4, 0, 0.2, 1),
+              transform var(--duration, 0.6s) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animated-text.visible {
+  opacity: 1;
+}
+
+/* Fade Up Animation */
+.animated-text.fade-up {
+  transform: translateY(20px);
+}
+
+.animated-text.fade-up.visible {
+  transform: translateY(0);
+}
+
+/* Fade In Animation */
+.animated-text.fade-in {
+  transform: none;
+}
+
+/* Slide Left Animation */
+.animated-text.slide-left {
+  transform: translateX(30px);
+}
+
+.animated-text.slide-left.visible {
+  transform: translateX(0);
+}
+
+/* Slide Right Animation */
+.animated-text.slide-right {
+  transform: translateX(-30px);
+}
+
+.animated-text.slide-right.visible {
+  transform: translateX(0);
+}
+
+/* Scale Animation */
+.animated-text.scale {
+  transform: scale(0.9);
+}
+
+.animated-text.scale.visible {
+  transform: scale(1);
+}
+
+

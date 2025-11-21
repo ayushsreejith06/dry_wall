@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { API_URL } from './config';
+import AnimatedText from './components/AnimatedText';
+import AnimatedButton from './components/AnimatedButton';
+import AnimatedCard from './components/AnimatedCard';
+import LoadingSpinner from './components/LoadingSpinner';
 import './ProjectDetailPage.css';
 
 export default function ProjectDetailPage() {
@@ -126,7 +130,10 @@ export default function ProjectDetailPage() {
   if (loading) {
     return (
       <div className="project-detail-page">
-        <div className="project-detail-loading">Loading project...</div>
+        <div className="project-detail-loading">
+          <LoadingSpinner size="large" />
+          <p style={{ marginTop: '16px' }}>Loading project...</p>
+        </div>
       </div>
     );
   }
@@ -150,11 +157,17 @@ export default function ProjectDetailPage() {
     <div className="project-detail-page">
       <header className="project-detail-header">
         <div>
-          <Link to="/projects" className="back-link">
-            ← Back to Projects
-          </Link>
-          <h1>{project.title}</h1>
-          <p className="project-detail-location">{project.location}</p>
+          <AnimatedText variant="fade-up" delay={0.1}>
+            <Link to="/projects" className="back-link">
+              ← Back to Projects
+            </Link>
+          </AnimatedText>
+          <AnimatedText variant="fade-up" delay={0.2} as="h1">
+            {project.title}
+          </AnimatedText>
+          <AnimatedText variant="fade-up" delay={0.3} as="p" className="project-detail-location">
+            {project.location}
+          </AnimatedText>
         </div>
         <div className="project-detail-actions">
           <label className="checkbox">
@@ -176,8 +189,9 @@ export default function ProjectDetailPage() {
       <div className="project-detail-content">
         {/* Map Section */}
         {project.location_data && (
-          <section className="project-detail-section">
-            <h2>Location Map</h2>
+          <AnimatedCard delay={100} className="project-detail-section-wrapper">
+            <section className="project-detail-section">
+              <h2>Location Map</h2>
             <div className="map-container">
               {getMapUrl() ? (
                 <iframe
@@ -205,11 +219,13 @@ export default function ProjectDetailPage() {
                 )}
               </div>
             </div>
-          </section>
+            </section>
+          </AnimatedCard>
         )}
 
         {/* Floor Plans Section */}
-        <section className="project-detail-section">
+        <AnimatedCard delay={150} className="project-detail-section-wrapper">
+          <section className="project-detail-section">
           <div className="section-header">
             <div>
               <h2>Floor Plans</h2>
@@ -228,17 +244,25 @@ export default function ProjectDetailPage() {
               style={{ display: 'none' }}
               id="file-upload-detail"
             />
-            <button
+            <AnimatedButton
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 document.getElementById('file-upload-detail').click();
               }}
               disabled={uploadingFiles}
+              variant="secondary"
               className="upload-button"
             >
-              {uploadingFiles ? 'Uploading...' : '📁 Add Floor Plan (PDF/DWG)'}
-            </button>
+              {uploadingFiles ? (
+                <>
+                  <LoadingSpinner size="small" />
+                  Uploading...
+                </>
+              ) : (
+                '📁 Add Floor Plan (PDF/DWG)'
+              )}
+            </AnimatedButton>
           </div>
 
           {(project.floor_plan_files || []).length > 0 ? (
@@ -295,10 +319,12 @@ export default function ProjectDetailPage() {
               </div>
             </div>
           )}
-        </section>
+          </section>
+        </AnimatedCard>
 
         {/* Notes Section */}
-        <section className="project-detail-section">
+        <AnimatedCard delay={200} className="project-detail-section-wrapper">
+          <section className="project-detail-section">
           <div className="section-header">
             <h2>Notes</h2>
             {!editingNotes && (
@@ -343,10 +369,12 @@ export default function ProjectDetailPage() {
               )}
             </div>
           )}
-        </section>
+          </section>
+        </AnimatedCard>
 
         {/* Project Status */}
-        <section className="project-detail-section">
+        <AnimatedCard delay={250} className="project-detail-section-wrapper">
+          <section className="project-detail-section">
           <h2>Project Information</h2>
           <div className="status-grid">
             <div className="status-item">
@@ -366,7 +394,8 @@ export default function ProjectDetailPage() {
               <span className="status-value">#{project.id}</span>
             </div>
           </div>
-        </section>
+          </section>
+        </AnimatedCard>
       </div>
     </div>
   );

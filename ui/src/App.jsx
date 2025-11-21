@@ -7,6 +7,8 @@ import ProjectsPage from './ProjectsPage';
 import ProjectDetailPage from './ProjectDetailPage';
 import ProjectFormPage from './ProjectFormPage';
 import UserSettingsPage from './UserSettingsPage';
+import AutoModePanel from './components/AutoModePanel';
+import StatusIndicator from './components/StatusIndicator';
 import { API_URL } from './config';
 import './App.css';
 
@@ -147,6 +149,13 @@ function App() {
   const [steeringReturning, setSteeringReturning] = useState(false);
   const [activeControl, setActiveControl] = useState(null);
   const [isJoystickActive, setIsJoystickActive] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [currentTask, setCurrentTask] = useState('Installing drywall panel');
+  const [tasks, setTasks] = useState([
+    { id: 1, name: 'Move to position A', status: 'completed' },
+    { id: 2, name: 'Installing drywall panel', status: 'active' },
+    { id: 3, name: 'Return to base', status: 'pending' },
+  ]);
   const { isAuthenticated, user, logout, checkAuth } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
@@ -295,6 +304,49 @@ function App() {
     }
   };
 
+  const handleChatMessage = async (message) => {
+    try {
+      // TODO: Implement chat endpoint
+      console.log('Chat message:', message);
+      // await fetch(`${API_URL}/chat`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ message }),
+      // });
+    } catch (err) {
+      console.error('Failed to send chat message', err);
+    }
+  };
+
+  const handlePause = async () => {
+    try {
+      await sendCommand('/stop', {});
+      setIsPaused(true);
+    } catch (err) {
+      console.error('Failed to pause', err);
+    }
+  };
+
+  const handlePlay = async () => {
+    try {
+      // Resume current task
+      setIsPaused(false);
+      // TODO: Implement resume endpoint
+    } catch (err) {
+      console.error('Failed to resume', err);
+    }
+  };
+
+  const handlePowerOff = async () => {
+    try {
+      await sendCommand('/emergency_stop', {});
+      setIsPaused(true);
+      // TODO: Add confirmation dialog
+    } catch (err) {
+      console.error('Failed to power off', err);
+    }
+  };
+
   // Show login page if not authenticated
   if (!isAuthenticated) {
     return <Login onLoginSuccess={() => {}} />;
@@ -384,66 +436,48 @@ function App() {
 
         {/* Main Control Area */}
         <div className="panel-main">
-          {/* Left Half - Joystick */}
-          <div 
-            className={`control-half left-half ${mode === 'auto' ? 'disabled' : ''}`}
-          >
-            <Joystick
-              onMove={handleJoystickMove}
-              onRelease={handleJoystickRelease}
-              disabled={mode === 'auto'}
-              x={joystickX}
-              y={joystickY}
+          {mode === 'auto' ? (
+            <AutoModePanel
+              onSendMessage={handleChatMessage}
+              currentTask={currentTask}
+              tasks={tasks}
+              onPause={handlePause}
+              onPlay={handlePlay}
+              onPowerOff={handlePowerOff}
+              isPaused={isPaused}
             />
-            {mode === 'auto' && (
-              <div style={{ 
-                position: 'absolute', 
-                top: '50%', 
-                left: '50%', 
-                transform: 'translate(-50%, -50%)',
-                color: '#7f90a8',
-                fontSize: '0.9rem',
-                pointerEvents: 'none',
-                zIndex: 10
-              }}>
-                Auto Mode Active
+          ) : (
+            <>
+              {/* Left Half - Joystick */}
+              <div className="control-half left-half">
+                <Joystick
+                  onMove={handleJoystickMove}
+                  onRelease={handleJoystickRelease}
+                  disabled={false}
+                  x={joystickX}
+                  y={joystickY}
+                />
               </div>
-            )}
-          </div>
 
-          {/* Right Half - Motion */}
-          <div 
-            className={`control-half right-half ${mode === 'auto' ? 'disabled' : ''}`}
-          >
-            <div className="vertical-slider-container">
-              <input
-                type="range"
-                min="-1"
-                max="1"
-                step="0.05"
-                value={throttle}
-                className={`vertical-range ${throttleReturning ? 'returning' : ''} ${activeControl === 'throttle' ? 'active' : ''}`}
-                onChange={(e) => handleThrottleChange(e.target.value)}
-                onMouseUp={handleThrottleRelease}
-                onTouchEnd={handleThrottleRelease}
-                disabled={mode === 'auto'}
-              />
-            </div>
-            {mode === 'auto' && (
-              <div style={{ 
-                position: 'absolute', 
-                top: '50%', 
-                left: '50%', 
-                transform: 'translate(-50%, -50%)',
-                color: '#7f90a8',
-                fontSize: '0.9rem',
-                pointerEvents: 'none',
-                zIndex: 10
-              }}>
-                Auto Mode Active
+              {/* Right Half - Motion */}
+              <div className="control-half right-half">
+                <div className="vertical-slider-container">
+                  <input
+                    type="range"
+                    min="-1"
+                    max="1"
+                    step="0.05"
+                    value={throttle}
+                    className={`vertical-range ${throttleReturning ? 'returning' : ''} ${activeControl === 'throttle' ? 'active' : ''}`}
+                    onChange={(e) => handleThrottleChange(e.target.value)}
+                    onMouseUp={handleThrottleRelease}
+                    onTouchEnd={handleThrottleRelease}
+                    disabled={false}
+                  />
+                </div>
               </div>
-            )}
-          </div>
+            </>
+          )}
         </div>
 
         {/* Bottom Status and Arm Controls */}
@@ -466,9 +500,11 @@ function App() {
               Arm Backward
             </button>
           </div>
-          <div className={`status-label ${connectionStatus === 'connected' ? 'connected' : ''}`}>
-            Status ({connectionStatus})
-          </div>
+          <StatusIndicator
+            status={connectionStatus === 'connected' ? 'connected' : connectionStatus === 'scanning' ? 'idle' : 'error'}
+            label={`Status (${connectionStatus})`}
+            pulse={connectionStatus === 'connected'}
+          />
           <div className="arm-controls-right">
             <button
               className={`arm-button ${activeControl === 'arm-up' ? 'active' : ''}`}

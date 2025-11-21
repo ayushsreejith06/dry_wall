@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { API_URL } from './config';
+import AnimatedText from './components/AnimatedText';
+import AnimatedButton from './components/AnimatedButton';
+import LoadingSpinner from './components/LoadingSpinner';
 import './Login.css';
 
 const DEMO_CREDENTIALS = [
@@ -155,8 +158,12 @@ export default function Login({ onLoginSuccess }) {
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
-          <h1>Drywall Robot Control</h1>
-          <p>Autonomous Robot Management System</p>
+          <AnimatedText variant="fade-up" delay={0.1} as="h1">
+            Drywall Robot Control
+          </AnimatedText>
+          <AnimatedText variant="fade-up" delay={0.2} as="p">
+            Autonomous Robot Management System
+          </AnimatedText>
         </div>
 
         <form onSubmit={isRegistering ? handleRegister : handleLogin} className="login-form">
@@ -242,11 +249,22 @@ export default function Login({ onLoginSuccess }) {
           {error && <div className="error-message">{error}</div>}
           {success && <div className="success-message">{success}</div>}
 
-          <button type="submit" className="login-button" disabled={isLoading}>
-            {isLoading 
-              ? (isRegistering ? 'Creating account...' : 'Logging in...') 
-              : (isRegistering ? 'Create Account' : 'Login')}
-          </button>
+          <AnimatedButton
+            type="submit"
+            variant="primary"
+            size="large"
+            disabled={isLoading}
+            className="login-button"
+          >
+            {isLoading ? (
+              <>
+                <LoadingSpinner size="small" />
+                {isRegistering ? 'Creating account...' : 'Logging in...'}
+              </>
+            ) : (
+              isRegistering ? 'Create Account' : 'Login'
+            )}
+          </AnimatedButton>
         </form>
 
         <div className="login-toggle">
@@ -267,30 +285,36 @@ export default function Login({ onLoginSuccess }) {
           <div className="demo-credentials">
             <p className="demo-title">Demo Credentials:</p>
             <div className="demo-buttons">
-              <button
+              <AnimatedButton
                 type="button"
-                className="demo-button"
+                variant="ghost"
+                size="small"
                 onClick={() => handleDemoLogin('alex', 'password123')}
                 disabled={isLoading}
+                className="demo-button"
               >
                 <strong>alex</strong> / password123
-              </button>
-              <button
+              </AnimatedButton>
+              <AnimatedButton
                 type="button"
-                className="demo-button"
+                variant="ghost"
+                size="small"
                 onClick={() => handleDemoLogin('operator', 'op123')}
                 disabled={isLoading}
+                className="demo-button"
               >
                 <strong>operator</strong> / op123
-              </button>
-              <button
+              </AnimatedButton>
+              <AnimatedButton
                 type="button"
-                className="demo-button"
+                variant="ghost"
+                size="small"
                 onClick={() => handleDemoLogin('admin', 'admin123')}
                 disabled={isLoading}
+                className="demo-button"
               >
                 <strong>admin</strong> / admin123
-              </button>
+              </AnimatedButton>
             </div>
           </div>
         )}

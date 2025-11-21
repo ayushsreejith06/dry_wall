@@ -1,0 +1,137 @@
+.animated-button {
+  position: relative;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+}
+
+.animated-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.button-content {
+  position: relative;
+  z-index: 2;
+  transition: transform 0.2s ease;
+}
+
+.button-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+  z-index: 1;
+}
+
+.animated-button:hover .button-shine {
+  left: 100%;
+}
+
+.animated-button:hover .button-content {
+  transform: translateY(-1px);
+}
+
+.animated-button.pressed .button-content {
+  transform: translateY(0);
+}
+
+/* Primary Variant */
+.animated-button.primary {
+  background: linear-gradient(135deg, #3dbaa0 0%, #2f9d8a 100%);
+  color: #0a0e14;
+  box-shadow: 
+    0 6px 20px rgba(61, 186, 160, 0.35),
+    0 0 0 1px rgba(61, 186, 160, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.animated-button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 28px rgba(61, 186, 160, 0.45),
+    0 0 0 1px rgba(61, 186, 160, 0.3),
+    0 0 30px rgba(61, 186, 160, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, #45c9b0 0%, #35aa90 100%);
+}
+
+/* Ghost Variant */
+.animated-button.ghost {
+  background: linear-gradient(135deg, rgba(15, 23, 34, 0.9) 0%, rgba(10, 14, 20, 0.9) 100%);
+  color: #cdd7e5;
+  border: 1px solid rgba(34, 50, 70, 0.8);
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.animated-button.ghost:hover {
+  border-color: #3dbaa0;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(61, 186, 160, 0.3),
+    0 0 20px rgba(61, 186, 160, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(20, 30, 44, 0.95) 0%, rgba(15, 23, 34, 0.95) 100%);
+}
+
+/* Secondary Variant */
+.animated-button.secondary {
+  background: linear-gradient(135deg, rgba(31, 46, 68, 0.9) 0%, rgba(35, 69, 92, 0.9) 100%);
+  color: #ffffff;
+  border: 1px solid rgba(44, 77, 104, 0.8);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.animated-button.secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(61, 186, 160, 0.3),
+    0 0 20px rgba(61, 186, 160, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  background: linear-gradient(135deg, rgba(33, 80, 108, 0.95) 0%, rgba(44, 107, 140, 0.95) 100%);
+  border-color: rgba(61, 186, 160, 0.4);
+}
+
+/* Sizes */
+.animated-button.small {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+
+.animated-button.medium {
+  padding: 12px 20px;
+  font-size: 0.95rem;
+}
+
+.animated-button.large {
+  padding: 16px 24px;
+  font-size: 1.1rem;
+}
+
+

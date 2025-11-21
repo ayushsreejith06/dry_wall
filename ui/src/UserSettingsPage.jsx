@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { API_URL } from './config';
+import AnimatedText from './components/AnimatedText';
+import AnimatedButton from './components/AnimatedButton';
+import LoadingSpinner from './components/LoadingSpinner';
 import './UserSettingsPage.css';
 
 const SECTIONS = [
@@ -281,9 +284,20 @@ export default function UserSettingsPage() {
                 <Link to="/" className="ghost-link">
                   Cancel
                 </Link>
-                <button type="submit" className="primary" disabled={saving}>
-                  {saving ? 'Saving...' : 'Save Changes'}
-                </button>
+                <AnimatedButton
+                  type="submit"
+                  variant="primary"
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <>
+                      <LoadingSpinner size="small" />
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
+                </AnimatedButton>
               </div>
             )}
           </form>

@@ -356,10 +356,19 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 40px;
-  align-items: center;
-  justify-items: center;
+  align-items: stretch;
+  justify-items: stretch;
   min-height: 300px;
   position: relative;
+}
+
+.panel-main > * {
+  min-height: 300px;
+}
+
+.panel-main > .auto-mode-panel {
+  grid-column: 1 / -1;
+  min-height: 400px;
 }
 
 

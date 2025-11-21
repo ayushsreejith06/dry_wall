@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { API_URL } from './config';
 import LocationAutocomplete from './LocationAutocomplete';
+import AnimatedText from './components/AnimatedText';
+import AnimatedButton from './components/AnimatedButton';
+import AnimatedCard from './components/AnimatedCard';
+import LoadingSpinner from './components/LoadingSpinner';
 import './ProjectFormPage.css';
 
 export default function ProjectFormPage() {
@@ -189,7 +193,10 @@ export default function ProjectFormPage() {
   if (loading) {
     return (
       <div className="project-form-page">
-        <div className="project-form-loading">Loading project...</div>
+        <div className="project-form-loading">
+          <LoadingSpinner size="large" />
+          <p style={{ marginTop: '16px' }}>Loading project...</p>
+        </div>
       </div>
     );
   }
@@ -198,19 +205,24 @@ export default function ProjectFormPage() {
     <div className="project-form-page">
       <header className="project-form-header">
         <div>
-          <Link to="/projects" className="back-link">
-            ← Back to Projects
-          </Link>
-          <h1>{isEditMode ? 'Edit Project' : 'New Project'}</h1>
-          <p className="muted">
+          <AnimatedText variant="fade-up" delay={0.1}>
+            <Link to="/projects" className="back-link">
+              ← Back to Projects
+            </Link>
+          </AnimatedText>
+          <AnimatedText variant="fade-up" delay={0.2} as="h1">
+            {isEditMode ? 'Edit Project' : 'New Project'}
+          </AnimatedText>
+          <AnimatedText variant="fade-up" delay={0.3} as="p" className="muted">
             {isEditMode ? 'Update project details' : 'Create a new project for a house'}
-          </p>
+          </AnimatedText>
         </div>
       </header>
 
       {error && <div className="banner error">{error}</div>}
 
-      <section className="project-form-card">
+      <AnimatedCard delay={100}>
+        <section className="project-form-card">
         <form className="project-form-content" onSubmit={handleSubmit}>
           <label>
             Location *
@@ -237,8 +249,9 @@ export default function ProjectFormPage() {
               id="floor-plan-upload"
             />
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <button
+              <AnimatedButton
                 type="button"
+                variant="secondary"
                 onClick={(e) => {
                   e.stopPropagation();
                   document.getElementById('floor-plan-upload').click();
@@ -247,7 +260,7 @@ export default function ProjectFormPage() {
                 style={{ width: 'fit-content' }}
               >
                 Select Floor Plan Files (PDF/DWG)
-              </button>
+              </AnimatedButton>
               
               {/* Existing files */}
               {existingFiles.length > 0 && (
@@ -370,19 +383,31 @@ export default function ProjectFormPage() {
           </label>
 
           <div className="form-actions">
-            <button
+            <AnimatedButton
               type="button"
-              className="ghost-link"
+              variant="ghost"
               onClick={() => navigate('/projects')}
             >
               Cancel
-            </button>
-            <button type="submit" className="primary" disabled={saving || uploadingFiles}>
-              {saving || uploadingFiles ? 'Saving...' : isEditMode ? 'Save Changes' : 'Create Project'}
-            </button>
+            </AnimatedButton>
+            <AnimatedButton
+              type="submit"
+              variant="primary"
+              disabled={saving || uploadingFiles}
+            >
+              {saving || uploadingFiles ? (
+                <>
+                  <LoadingSpinner size="small" />
+                  Saving...
+                </>
+              ) : (
+                isEditMode ? 'Save Changes' : 'Create Project'
+              )}
+            </AnimatedButton>
           </div>
         </form>
-      </section>
+        </section>
+      </AnimatedCard>
     </div>
   );
 }

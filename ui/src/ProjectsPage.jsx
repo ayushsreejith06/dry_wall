@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { API_URL } from './config';
+import AnimatedText from './components/AnimatedText';
+import AnimatedButton from './components/AnimatedButton';
+import AnimatedCard from './components/AnimatedCard';
+import LoadingSpinner from './components/LoadingSpinner';
+import StatusIndicator from './components/StatusIndicator';
 import './Projects.css';
 
 export default function ProjectsPage() {
@@ -65,26 +70,33 @@ export default function ProjectsPage() {
     <div className="projects-page">
       <header className="projects-header">
         <div>
-          <p className="eyebrow">Project Library</p>
-          <h1>Projects</h1>
-          <p className="muted">
+          <AnimatedText variant="fade-up" delay={0.1} as="p" className="eyebrow">
+            Project Library
+          </AnimatedText>
+          <AnimatedText variant="fade-up" delay={0.2} as="h1">
+            Projects
+          </AnimatedText>
+          <AnimatedText variant="fade-up" delay={0.3} as="p" className="muted">
             Keep track of locations, linked floor plans, and job readiness.
-          </p>
+          </AnimatedText>
         </div>
-        <Link className="ghost-link" to="/">
-          ← Back to Controls
-        </Link>
+        <AnimatedText variant="fade-up" delay={0.2}>
+          <Link className="ghost-link" to="/">
+            ← Back to Controls
+          </Link>
+        </AnimatedText>
       </header>
 
-      <section className="projects-card">
+      <AnimatedCard delay={100}>
         <div className="projects-toolbar">
-          <button
-            className="new-project-button"
-            type="button"
+          <AnimatedButton
+            variant="secondary"
+            size="medium"
             onClick={() => navigate('/projects/new')}
+            className="new-project-button"
           >
             New Project
-          </button>
+          </AnimatedButton>
           <div className="project-tally">
             <span className="pill neutral">Total {projectSummary.total}</span>
             <span className="pill success">Ready {projectSummary.completed}</span>
@@ -94,7 +106,10 @@ export default function ProjectsPage() {
         {error && <div className="banner error">{error}</div>}
 
         {loading ? (
-          <div className="projects-empty">Loading projects…</div>
+          <div className="projects-empty">
+            <LoadingSpinner size="medium" />
+            <p style={{ marginTop: '16px' }}>Loading projects…</p>
+          </div>
         ) : projects.length === 0 ? (
           <div className="projects-empty">
             <p>No projects yet.</p>
@@ -155,9 +170,12 @@ export default function ProjectsPage() {
                       </div>
                     </td>
                     <td className="table-col-status">
-                      <span className={`table-status ${project.completed ? 'success' : 'neutral'}`}>
-                        {project.completed ? 'Completed' : 'In Progress'}
-                      </span>
+                      <StatusIndicator
+                        status={project.completed ? 'completed' : 'idle'}
+                        label={project.completed ? 'Completed' : 'In Progress'}
+                        pulse={!project.completed}
+                        className="badge"
+                      />
                     </td>
                      <td className="table-col-actions">
                        <Link
@@ -173,7 +191,7 @@ export default function ProjectsPage() {
             </table>
           </div>
         )}
-      </section>
+      </AnimatedCard>
     </div>
   );
 }
